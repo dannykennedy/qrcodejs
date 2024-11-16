@@ -9,6 +9,10 @@
     />
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="qrcode.js"></script>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"
+    ></script>
   </head>
   <body>
     <input
@@ -46,7 +50,10 @@
           return;
         }
 
-        qrcode.makeCode(elText.value);
+        var url = elText.value;
+
+        qrcode.makeCode(url);
+        makeStyledQrCode(url);
       }
 
       makeCode();
