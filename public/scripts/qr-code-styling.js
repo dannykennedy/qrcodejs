@@ -1,24 +1,45 @@
-function makeStyledQrCode(url) {
+function makeStyledQrCode(
+  url,
+  shapeType,
+  fileType,
+  color,
+  size,
+  cornerShapeType,
+  cornersDotType
+) {
   const qrCode = new QRCodeStyling({
-    width: 300,
-    height: 300,
-    type: "svg",
+    width: size,
+    height: size,
+    type: fileType,
     data: url,
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg",
+    // image:
+    //   "https://elsewhere.to/static/media/moon-transparent.1aef3e17886ed29bcbf4.png",
     dotsOptions: {
-      color: "#4267b2",
-      type: "rounded",
+      color: color,
+      type: shapeType,
     },
     backgroundOptions: {
-      color: "#e9ebee",
+      color: "transparent",
     },
-    imageOptions: {
-      crossOrigin: "anonymous",
-      margin: 20,
+    // imageOptions: {
+    //   // crossOrigin: "anonymous",
+    //   margin: 10,
+    // },
+    cornersSquareOptions: {
+      color: color,
+      type: cornerShapeType,
+    },
+    cornersDotOptions: {
+      color: color,
+      type: cornersDotType,
     },
   });
 
-  qrCode.append(document.getElementById("canvas"));
-  qrCode.download({ name: "qr", extension: "svg" });
+  qrCode.append(document.getElementById("qr-canvas"));
+
+  window.qrCode = qrCode;
+}
+
+function downloadQrCode() {
+  window.qrCode.download({ name: "qr", extension: "svg" });
 }
