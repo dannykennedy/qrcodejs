@@ -7,21 +7,18 @@
       name="viewport"
       content="width=device-width,initial-scale=1,user-scalable=no"
     />
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="qrcode.js"></script>
     <script
       type="text/javascript"
       src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"
     ></script>
-    <script type="text/javascript" src="jquery.min.js"></script>
-    <script type="text/javascript" src="qrcode.js"></script>
-    <script type="text/javascript" src="./scripts/qr-code-styling.js"></script>
-    <!-- Import styles/qr-gen.css -->
-    <link rel="stylesheet" type="text/css" href="./styles/qr-gen.css" />
   </head>
   <body>
     <input
       id="text"
       type="text"
-      value="http://map.lswr.to"
+      value="https://www.njamed.com/?src=map-qr"
       style="width: 80%"
     /><br />
     <p>
@@ -30,77 +27,22 @@
         click on the qr code and select 'Save image as'. Code from
         <a href="https://davidshimjs.github.io/qrcodejs/"
           >https://davidshimjs.github.io/qrcodejs/</a
-        >
-        and
-        <a href="https://www.npmjs.com/package/qr-code-styling"
-          >npmjs.com/package/qr-code-styling</a
         ></i
       >
     </p>
-    <!-- Dropdown with QR code options: 'rounded' 'dots' 'classy' 'classy-rounded' 'square' 'extra-rounded' -->
-    <select id="qr-code-type">
-      <option value="square">Square</option>
-      <option value="dots">Dots</option>
-      <option value="rounded">Rounded</option>
-      <option value="classy">Classy</option>
-      <option value="classy-rounded">Classy Rounded</option>
-      <option value="extra-rounded">Extra Rounded</option>
-    </select>
-    <!-- Corner square options 'dot' 'square' 'extra-rounded' -->
-    <select id="qr-code-corner-square">
-      <option value="square">Square</option>
-      <option value="dot">Dot</option>
-      <option value="extra-rounded">Extra Rounded</option>
-    </select>
-    <!-- Corner dot options 'dot' 'square' -->
-    <select id="qr-code-corner-dot">
-      <option value="square">Square</option>
-      <option value="dot">Dot</option>
-    </select>
-    <!-- Select with filetype options 'png' 'jpeg' 'webp' 'svg' -->
-    <select id="qr-code-filetype">
-      <option value="svg">SVG</option>
-      <option value="png">PNG</option>
-      <option value="jpeg">JPEG</option>
-      <option value="webp">WEBP</option>
-    </select>
-    <!-- Select with colours (black, white) -->
-    <select id="qr-code-color">
-      <option value="#fff">White</option>
-      <option value="#000">Black</option>
-      <option value="#21251D">Light Black</option>
-      <option value="#f6f5f1">Cream</option>
-      <option value="#314d72">Dark Blue</option>
-    </select>
-    <!-- Input for size (default = 500) -->
-    <input
-      id="qr-code-size"
-      type="number"
-      value="500"
-      style="width: 50px"
-    /><br />
-    <!-- Append -->
-    <div id="qrs-wrapper">
-      <div id="qr-canvas"></div>
-      <div id="qrcode"></div>
-    </div>
-    <!-- Button to downloadQrCode() -->
-    <button onclick="downloadQrCode()">Download QR Code</button>
+    <div
+      id="qrcode"
+      style="width: 100px; height: 100px; margin-top: 15px"
+    ></div>
 
     <script type="text/javascript">
-      // var qrcode = new QRCode(document.getElementById("qrcode"), {
-      //   width: 500,
-      //   height: 500,
-      // });
+      var qrcode = new QRCode(document.getElementById("qrcode"), {
+        width: 500,
+        height: 500,
+      });
 
       function makeCode() {
         var elText = document.getElementById("text");
-        var elType = document.getElementById("qr-code-type");
-        var elFileType = document.getElementById("qr-code-filetype");
-        var elColor = document.getElementById("qr-code-color");
-        var elSize = document.getElementById("qr-code-size");
-        var elCornerSquare = document.getElementById("qr-code-corner-square");
-        var elCornerDot = document.getElementById("qr-code-corner-dot");
 
         if (!elText.value) {
           alert("Input a text");
@@ -110,16 +52,8 @@
 
         var url = elText.value;
 
-        // qrcode.makeCode(url);
-        // makeStyledQrCode(
-        //   url,
-        //   elType.value,
-        //   elFileType.value,
-        //   elColor.value,
-        //   elSize.value,
-        //   elCornerSquare.value,
-        //   elCornerDot.value
-        // );
+        qrcode.makeCode(url);
+        makeStyledQrCode(url);
       }
 
       makeCode();
