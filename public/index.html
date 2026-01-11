@@ -9,8 +9,10 @@
     />
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="qrcode.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   </head>
   <body>
+    <h2>Single QR Code Generator</h2>
     <input
       id="text"
       type="text"
@@ -26,9 +28,49 @@
         ></i
       >
     </p>
+    <div id="qrcode" style="margin-top: 15px"></div>
+
+    <hr style="margin: 40px 0" />
+
+    <h2>Bulk QR Code Generator</h2>
+    <p>
+      <label for="baseUrl">Base URL:</label><br />
+      <input
+        id="baseUrl"
+        type="text"
+        placeholder="https://example.com"
+        style="width: 80%; margin-bottom: 10px"
+      />
+    </p>
+    <p>
+      <label for="paths">Paths/Codes (one per line):</label><br />
+      <textarea
+        id="paths"
+        rows="10"
+        style="width: 80%; font-family: monospace"
+        placeholder="123&#10;234&#10;456&#10;or&#10;/path1&#10;/path2&#10;or&#10;&code=abc&#10;&code=def"
+      ></textarea>
+    </p>
+    <p>
+      <label>Format:</label>
+      <input type="radio" id="formatPNG" name="format" value="png" checked />
+      <label for="formatPNG">PNG</label>
+      <input type="radio" id="formatSVG" name="format" value="svg" />
+      <label for="formatSVG">SVG</label>
+    </p>
+    <p>
+      <button id="generateBulk" style="padding: 10px 20px; font-size: 16px">
+        Generate & Download All QR Codes
+      </button>
+    </p>
     <div
-      id="qrcode"
-      style="width: 100px; height: 100px; margin-top: 15px"
+      id="bulkPreview"
+      style="
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 20px;
+      "
     ></div>
 
     <script type="text/javascript">
@@ -60,6 +102,129 @@
             makeCode();
           }
         });
+
+      // Bulk QR Code Generation
+      $("#generateBulk").on("click", function () {
+        var baseUrl = $("#baseUrl").val().trim();
+        var pathsText = $("#paths").val();
+        var useSVG = $("#formatSVG").is(":checked");
+        var format = useSVG ? "svg" : "png";
+
+        if (!baseUrl) {
+          alert("Please enter a base URL");
+          return;
+        }
+
+        if (!pathsText.trim()) {
+          alert("Please enter at least one path/code");
+          return;
+        }
+
+        // Parse paths (split by newlines, filter out empty lines)
+        var paths = pathsText
+          .split("\n")
+          .map(function (p) {
+            return p.trim();
+          })
+          .filter(function (p) {
+            return p.length > 0;
+          });
+
+        if (paths.length === 0) {
+          alert("No valid paths found");
+          return;
+        }
+
+        // Clear previous preview
+        var preview = $("#bulkPreview");
+        preview.empty();
+
+        // Generate QR codes
+        var qrCodes = [];
+        paths.forEach(function (path) {
+          var fullUrl = baseUrl + path;
+
+          // Create container for this QR code
+          var container = $("<div>").css({
+            "text-align": "center",
+            border: "1px solid #ddd",
+            padding: "10px",
+            "border-radius": "5px",
+          });
+
+          var qrDiv = $("<div>").css({
+            width: "150px",
+            height: "150px",
+            margin: "0 auto",
+          });
+
+          container.append(qrDiv);
+          container.append(
+            $("<p>")
+              .css({
+                "font-size": "10px",
+                "word-break": "break-all",
+                "margin-top": "5px",
+              })
+              .text(fullUrl)
+          );
+
+          preview.append(container);
+
+          // Generate QR code
+          var qr = new QRCode(qrDiv[0], {
+            text: fullUrl,
+            width: 1000,
+            height: 1000,
+            useSVG: useSVG,
+          });
+
+          qrCodes.push({
+            path: path,
+            element: qrDiv,
+            format: format,
+          });
+        });
+
+        // Wait a bit for QR codes to render, then create ZIP
+        setTimeout(function () {
+          generateZip(qrCodes);
+        }, 500);
+      });
+
+      function generateZip(qrCodes) {
+        var zip = new JSZip();
+
+        qrCodes.forEach(function (item) {
+          var qrElement = item.element.find("img, svg")[0];
+
+          if (!qrElement) {
+            console.error("QR code not found for", item.path);
+            return;
+          }
+
+          var filename = item.path + "." + item.format;
+
+          if (item.format === "png") {
+            // For PNG (canvas-based), the img src is already a data URL
+            var dataUrl = qrElement.src;
+            var base64Data = dataUrl.split(",")[1];
+            zip.file(filename, base64Data, { base64: true });
+          } else {
+            // For SVG
+            var svgData = new XMLSerializer().serializeToString(qrElement);
+            zip.file(filename, svgData);
+          }
+        });
+
+        // Generate and download ZIP
+        zip.generateAsync({ type: "blob" }).then(function (blob) {
+          var link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "qr-codes.zip";
+          link.click();
+        });
+      }
     </script>
   </body>
 </html>
