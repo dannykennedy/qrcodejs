@@ -203,7 +203,7 @@
             return;
           }
 
-          var filename = item.path + "." + item.format;
+          var filename = String(item.path) + "." + item.format;
 
           if (item.format === "png") {
             // For PNG (canvas-based), the img src is already a data URL
