@@ -177,6 +177,8 @@
             width: 1000,
             height: 1000,
             useSVG: useSVG,
+            colorDark: "#000000",
+            colorLight: "rgba(0,0,0,0)",
           });
 
           qrCodes.push({
@@ -203,7 +205,7 @@
             return;
           }
 
-          var filename = String(item.path) + "." + item.format;
+          var filename = `${item.path}.${item.format}`;
 
           if (item.format === "png") {
             // For PNG (canvas-based), the img src is already a data URL
